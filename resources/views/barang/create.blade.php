@@ -29,9 +29,9 @@
           <div class="mb-5">
             {{-- tanggal input --}}
             <label for="tanggal" class="mb-2 block text-sm font-medium text-gray-900">
-              Tanggal Masuk
+              Bulan Masuk
             </label>
-            <input type="date" id="tanggal" name="tanggal"
+            <input type="month" id="tanggal" name="tanggal"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
               required />
           </div>
@@ -47,7 +47,7 @@
             <label for="jumlah" class="mb-2 block text-sm font-medium text-gray-900">
               Jumlah
             </label>
-            <input type="number" id="jumlah" name="jumlah" min="50"
+            <input type="number" id="jumlah" name="jumlah" min="1"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
               required />
           </div>

@@ -44,7 +44,7 @@
                 <th scope="col" class="px-6 py-3">Kategori</th>
                 <th scope="col" class="px-6 py-3">Item</th>
                 <th scope="col" class="px-6 py-3">Jumlah</th>
-                <th scope="col" class="px-6 py-3">Tanggal Masuk</th>
+                <th scope="col" class="px-6 py-3">Bulan Masuk</th>
                 <th scope="col" class="px-6 py-3">Aksi</th>
               </tr>
             </thead>
@@ -67,7 +67,7 @@
                   </th>
                   <td class="px-6 py-4">
                     <span class="text-sm font-medium text-gray-900">
-                      {{ $barang->created_at->format('d F Y') }}
+                      {{ $barang->created_at->format('F Y') }}
                     </span>
                   </td>
                   <td class="px-6 py-4">
