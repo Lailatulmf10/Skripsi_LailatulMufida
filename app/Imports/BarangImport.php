@@ -3,6 +3,8 @@
 namespace App\Imports;
 
 use App\Models\Barang;
+use App\Models\Kategori;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 
 class BarangImport implements ToModel
@@ -14,12 +16,21 @@ class BarangImport implements ToModel
    */
   public function model(array $row)
   {
-    $current_date = date('Y-m-d H:i:s');
+    if ($row[0] == 'No.' || $row[0] == null) {
+      return;
+    }
+
+    $kategori = Kategori::where('nama', $row[1])->first();
+    if (!$kategori) {
+      $kategori = Kategori::create(['nama' => $row[1]]);
+    }
+    
     return new Barang([
-      'kategori_id' => $row[0],
-      'nama' => $row[1],
-      'jumlah' => $row[2],
-      'created_at' => $current_date,
+      'kategori_id' => $kategori->id,
+      'nama' => $row[2],
+      'jumlah' => $row[3],
+      'jumlah_transaksi' => $row[4],
+      'created_at' => Carbon::createFromFormat('Y-m', $row[5]),
     ]);
   }
 }

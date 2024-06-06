@@ -53,6 +53,14 @@
               value="{{ old('jumlah', $barang->jumlah) }}" required />
           </div>
           <div class="mb-5">
+            <label for="jumlah_transaksi" class="mb-2 block text-sm font-medium text-gray-900">
+              Jumlah Transaksi
+            </label>
+            <input type="number" id="jumlah_transaksi" name="jumlah_transaksi" min="1"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
+              value="{{ old('jumlah_transaksi', $barang->jumlah_transaksi) }}" required />
+          </div>
+          <div class="mb-5">
             <label for="category" class="mb-2 block text-sm font-medium text-gray-900">
               Kategori
             </label>
