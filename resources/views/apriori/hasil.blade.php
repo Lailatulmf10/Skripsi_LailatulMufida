@@ -163,13 +163,13 @@
             </tbody>
           </table>
           <nav class="p-4 border-t" aria-label="Table navigation">
-            <p class="font-semibold">Pola hasil analisa</p>
+            <p class="font-semibold">Aturan Asosiasi</p>
           </nav>
           <table class="w-full text-left text-sm text-gray-500 rtl:text-right">
             <thead class="bg-gray-50 text-xs uppercase text-gray-700">
               <tr>
                 <th scope="col" class="px-6 py-3">No</th>
-                <th scope="col" class="px-6 py-3">Pola</th>
+                <th scope="col" class="px-6 py-3">Asosiasi</th>
                 <th scope="col" class="px-6 py-3">Confidence</th>
               </tr>
             </thead>
