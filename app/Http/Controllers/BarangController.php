@@ -66,6 +66,7 @@ class BarangController extends Controller
         'nama' => $request->nama,
         'kategori_id' => $request->kategori_id,
         'jumlah' => $request->jumlah,
+        'jumlah_transaksi' => $request->jumlah_transaksi,
         'harga' => $request->harga,
         'created_at' => $request->tanggal,
       ]);
@@ -132,6 +133,7 @@ class BarangController extends Controller
         'nama' => $request->nama,
         'kategori_id' => $request->kategori_id,
         'jumlah' => $request->jumlah,
+        'jumlah_transaksi' => $request->jumlah_transaksi,
         'harga' => $request->harga,
         'created_at' => $request->tanggal,
       ]);

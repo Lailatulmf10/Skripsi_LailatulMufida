@@ -12,16 +12,41 @@ use App\Models\Barang;
 use App\Models\NilaiKombinasi;
 use App\Models\Penjualan;
 use App\Models\Support;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AprioriController extends Controller
 {
   public function index()
   {
-    return view('apriori.index');
+    $semuaBulan = Barang::selectRaw('MONTH(created_at) as bulan')
+      ->groupBy('bulan')
+      ->get()
+      ->mapWithKeys(function ($item) {
+        $bulan = str_pad($item->bulan, 2, '0', STR_PAD_LEFT);
+        return [$bulan => $this->getBulanName($bulan)];
+      })
+      ->all();
+
+    $semuaTahun = Barang::selectRaw('YEAR(created_at) as tahun')
+      ->groupBy('tahun')
+      ->get();
+
+    return view('apriori.index', compact(['semuaBulan', 'semuaTahun']));
   }
 
   public function prosesAnalisaApriori(Request $request)
   {
+    $validator = Validator::make($request->all(), [
+      'bulan' => 'required',
+      'tahun' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+      Alert::error('Proses apriori gagal dilakukan', $validator->errors()->first());
+      return back()->withErrors($validator)->withInput();
+    }
+
     $totalPenjualan = Penjualan::count();
     if ($totalPenjualan < 3) {
       Alert::info('Info', 'Data penjualan kurang, silahkan tambahkan data penjualan terlebih dahulu');
@@ -31,81 +56,80 @@ class AprioriController extends Controller
       $minConfidence = $request->min_confidence;
 
       // Insert data pengujian
-      $kdPengujian = Str::uuid();
-      $pengujian = new Pengujian();
-      $pengujian->kode_pengujian = $kdPengujian;
-      $pengujian->nama_penguji = $request->nama_penguji;
-      $pengujian->min_support = $minSupp;
-      $pengujian->min_confidence = $minConfidence;
-      $totalBarang = Barang::count();
+      $kdPengujian =  'KD' . $request->tahun . $request->bulan . str_pad(auth()->user()->id, 4, '0', STR_PAD_LEFT);
+      
+      Pengujian::updateOrCreate([
+        'kode_pengujian' => $kdPengujian,
+        'nama_penguji' => $request->nama_penguji,
+        'min_support' => $minSupp,
+        'min_confidence' => $minConfidence,
+      ]);
+      Support::where('kode_pengujian', $kdPengujian)->delete();
+      NilaiKombinasi::where('kode_pengujian', $kdPengujian)->delete();
+      
+      $totalHari = Penjualan::select('hari_ke')
+        ->whereYear('created_at', $request->tahun)
+        ->whereMonth('created_at', $request->bulan)
+        ->groupBy('hari_ke')
+        ->get()
+        ->count();
 
       // cari nilai support
-      $dataBarang = Barang::all();
-      foreach ($dataBarang as $barang) {
-        $idBarang = $barang->id;
-        $totalTransaksi = Penjualan::where('barang_id', $idBarang)->count();
-        $nSupport = ($totalTransaksi / $totalBarang) * 100;
+      $penjualanList = Penjualan::select('barang_id', DB::raw('count(*) as jumlah_transaksi'))
+        ->where('no_faktur', '=', 'NF'.$request->tahun.$request->bulan)
+        ->groupBy('barang_id')
+        ->get();
+
+      foreach ($penjualanList as $penjualan) {
+        $nSupport = ($penjualan->jumlah_transaksi / $totalHari) * 100;
         $supp = new Support();
         $supp->kode_pengujian = $kdPengujian;
-        $supp->barang_id = $idBarang;
+        $supp->barang_id = $penjualan->barang_id;
+        $supp->jumlah_transaksi = $penjualan->jumlah_transaksi;
         $supp->support = $nSupport;
         $supp->save();
       }
 
       // Kombinasi 2 item set
-      $qProdukA = Support::where('kode_pengujian', $kdPengujian)->where('support', '>=', $minSupp)->get();
-      foreach ($qProdukA as $produkA) {
-        $kdProdukA = $produkA->barang_id;
-        $qProdukB = Support::where('kode_pengujian', $kdPengujian)->where('support', '>=', $minSupp)->get();
-        foreach ($qProdukB as $produkB) {
-          $kdProdukB = $produkB->barang_id;
-          $jumB = NilaiKombinasi::where('barang_id_a', $kdProdukA)->count();
-          if ($jumB > 0) {
-          } else {
-            if ($kdProdukA == $kdProdukB) {
-            } else {
-              $kdKombinasi = Str::uuid();
-              $nk = new NilaiKombinasi();
-              $nk->kode_pengujian = $kdPengujian;
-              $nk->kode_kombinasi = $kdKombinasi;
-              $nk->barang_id_a = $kdProdukA;
-              $nk->barang_id_b = $kdProdukB;
-              $nk->jumlah_transaksi = 0;
-              $nk->support = 0;
-              $nk->save();
+      $aSupports = Support::where('kode_pengujian', $kdPengujian)->where('support', '>=', $minSupp)->get();
+      foreach ($aSupports as $aSupport) {
+        $aBarangId = $aSupport->barang_id;
+        $bSupports = Support::where('kode_pengujian', $kdPengujian)->where('support', '>=', $minSupp)->get();
+        foreach ($bSupports as $bSupport) {
+          $bBarangId = $bSupport->barang_id;
+          if ($aBarangId != $bBarangId) {
+            $kdKombinasi = Str::uuid();
+            
+            $nk = new NilaiKombinasi();
+            $nk->kode_pengujian = $kdPengujian;
+            $nk->kode_kombinasi = $kdKombinasi;
+            $nk->barang_id_a = $aBarangId;
+            $nk->barang_id_b = $bBarangId;
+
+            $aListPenjualan = Penjualan::whereYear('created_at', $request->tahun)
+              ->whereMonth('created_at', $request->bulan)
+              ->where('barang_id', $aBarangId)
+              ->get();
+            
+            $bListPenjualan = Penjualan::whereYear('created_at', $request->tahun)
+              ->whereMonth('created_at', $request->bulan)
+              ->where('barang_id', $bBarangId)
+              ->get();
+            
+            $jumlahTransaksi = 0;
+            foreach ($aListPenjualan as $aPenjualan) {
+              if ($bListPenjualan->where('hari_ke', $aPenjualan->hari_ke)->first()) {
+                $jumlahTransaksi += 1;
+              }
             }
+
+            $nk->jumlah_transaksi = $jumlahTransaksi;
+            $nk->support = ($jumlahTransaksi / $totalHari) * 100;;
+            $nk->save();
           }
         }
       }
 
-      // Kombinasi 2 itemset phase 2
-      $nilaiKombinasi = NilaiKombinasi::where('kode_pengujian', $kdPengujian)->get();
-      foreach ($nilaiKombinasi as $nk) {
-        $kdKombinasi = $nk->kode_kombinasi;
-        $kdProdukA = $nk->barang_id_a;
-        $kdProdukB = $nk->barang_id_b;
-
-        // cari total transaksi
-        $dataFaktur = Penjualan::distinct()->get(['no_faktur']);
-        $fnTransaksi = 0;
-        foreach ($dataFaktur as $faktur) {
-          $noFaktur = $faktur->no_faktur;
-          $qBonTransaksiA = Penjualan::where('no_faktur', $noFaktur)->where('barang_id', $kdProdukA)->count();
-          $qBonTransaksiB = Penjualan::where('no_faktur', $noFaktur)->where('barang_id', $kdProdukB)->count();
-          if ($qBonTransaksiA == 1 && $qBonTransaksiB == 1) {
-            $fnTransaksi++;
-          }
-        }
-        $suppport = ($fnTransaksi / $totalBarang) * 100;
-        NilaiKombinasi::where('kode_kombinasi', $kdKombinasi)->update(
-          [
-            'jumlah_transaksi' => $fnTransaksi,
-            'support' => $suppport
-          ]
-        );
-      }
-
-      $pengujian->save();
       Alert::success('Berhasil', 'Data berhasil disimpan');
       return redirect()->route('apriori.index');
     }
@@ -118,9 +142,19 @@ class AprioriController extends Controller
     $dataMinSupp = Support::where('kode_pengujian', $kdPengujian)->where('support', '>=', $dataPengujian->min_support)->get();
     $dataKombinasiItemSet = NilaiKombinasi::where('kode_pengujian', $kdPengujian)->get();
     $dataMinConfidence = NilaiKombinasi::where('kode_pengujian', $kdPengujian)->where('support', '>=', $dataPengujian->min_confidence)->get();
-    $totalBarang = Barang::count();
+    $totalHari = Penjualan::select('hari_ke')
+        ->whereYear('created_at', substr($kdPengujian, 2, 4))
+        ->whereMonth('created_at', substr($kdPengujian, 6, 2))
+        ->groupBy('hari_ke')
+        ->get()
+        ->count();
 
-    return view('apriori.hasil', compact('dataPengujian', 'dataSupportBarang', 'dataMinSupp', 'dataKombinasiItemSet', 'dataMinConfidence', 'totalBarang'));
+    $polaHasilAnalisa = $dataMinConfidence;
+    foreach ($polaHasilAnalisa as $data) {
+      $data->confidence = round(($data->jumlah_transaksi / $dataMinSupp->where('barang_id', $data->barang_id_a)->first()->jumlah_transaksi) * 100, 2);
+    }
+
+    return view('apriori.hasil', compact('dataPengujian', 'dataSupportBarang', 'dataMinSupp', 'dataKombinasiItemSet', 'dataMinConfidence', 'totalHari'));
   }
 
   public function cetakAnalisa($kdPengujian)
@@ -130,5 +164,37 @@ class AprioriController extends Controller
     $totalBarang = Barang::count();
     $pdf = PDF::loadView('apriori.cetak', compact('dataPengujian', 'dataMinConfidence', 'totalBarang'));
     return $pdf->stream();
+  }
+
+  function getBulanName($bulan)
+  {
+    $bulanNames = [
+      '01' => 'Januari',
+      '02' => 'Februari',
+      '03' => 'Maret',
+      '04' => 'April',
+      '05' => 'Mei',
+      '06' => 'Juni',
+      '07' => 'Juli',
+      '08' => 'Agustus',
+      '09' => 'September',
+      '10' => 'Oktober',
+      '11' => 'November',
+      '12' => 'Desember',
+    ];
+
+    return $bulanNames[$bulan] ?? '';
+  }
+
+  function countDays($year, $month, $ignore) {
+    $count = 0;
+    $counter = mktime(0, 0, 0, $month, 1, $year);
+    while (date("n", $counter) == $month) {
+        if (in_array(date("w", $counter), $ignore) == false) {
+            $count++;
+        }
+        $counter = strtotime("+1 day", $counter);
+    }
+    return $count;  
   }
 }

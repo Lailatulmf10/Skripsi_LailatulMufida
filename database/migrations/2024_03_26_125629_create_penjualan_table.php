@@ -18,6 +18,7 @@ return new class extends Migration
       $table->char('no_faktur', 63);
       $table->foreignId('barang_id')->constrained('barang');
       $table->integer('qty');
+      $table->integer('hari_ke');
       $table->timestamps();
     });
   }

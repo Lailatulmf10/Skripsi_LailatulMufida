@@ -15,6 +15,9 @@ class Kategori extends Model
     'created_at',
     'updated_at',
   ];
+  protected $fillable = [
+    'nama'
+  ];
   public $timestamps = false;
 
   public function barang()

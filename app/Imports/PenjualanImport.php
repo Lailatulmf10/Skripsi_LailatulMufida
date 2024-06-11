@@ -4,30 +4,54 @@ namespace App\Imports;
 
 use App\Models\Barang;
 use App\Models\Penjualan;
-use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Concerns\ToCollection;
 
-class PenjualanImport implements ToModel
+class PenjualanImport implements ToCollection
 {
-  /**
-   * @param array $row
-   *
-   * @return \Illuminate\Database\Eloquent\Model|null
-   */
-  public function model(array $row)
+  public function collection(Collection $collection)
   {
-    $namaBarang = $row[1];
-    $dataBarang = Barang::where('nama', $namaBarang)->first();
-    $qty = $row[2];
+    $data = [];
+    $date = now();
+    foreach ($collection as $key => $columns) {
+      if ($key == 0) {
+        $date = Carbon::createFromFormat('Y-m', $columns[0])->startOfMonth()->startOfDay();
+        continue;
+      }
 
-    if ($qty >= 50) {
-      return new Penjualan([
-        'no_faktur' => $row[0],
-        'barang_id' => $dataBarang->id ?? 1,
-        'qty' => $qty,
-      ]);
-    } else {
-      return null;
+      if ($columns[0] == null) {
+        continue;
+      }
+
+      if ($columns[0] == 'Hari') {
+        foreach ($columns as $key => $column) {
+          if ($column == 'Hari') {
+            continue;
+          }
+
+          $barang = Barang::where('nama', $column)->first();
+          if ($barang) {
+            $data[$key] = $barang->id;
+          }
+        }
+        continue;
+      }
+
+      if ((string)(int)$columns[0] == $columns[0]) {
+        foreach ($data as $key => $barangId) {
+          if ($columns[$key] > 0) {
+            Penjualan::updateOrCreate([
+              'no_faktur' => 'NF'.$date->year.$date->month,
+              'barang_id' => $barangId,
+              'qty' => $columns[$key],
+              'created_at' => $date,
+              'hari_ke' => $columns[0],
+            ]);
+          }
+        }
+      }
     }
   }
 }

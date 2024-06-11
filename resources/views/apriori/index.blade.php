@@ -21,35 +21,63 @@
         </div>
         <form method="POST" action="{{ route('apriori.proses') }}" class="mx-auto p-4 sm:px-6">
           @csrf
-          <div class="mb-5">
+          <div class="mb-5 hidden">
             <label for="nama_penguji" class="mb-2 block text-sm font-medium text-gray-900">
               Nama Penguji
             </label>
             <input type="text" id="nama_penguji" name="nama_penguji"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
-              required />
+              required value="{{auth()->user()->name}}"/>
           </div>
-          <div class="mb-5">
+          <div class="mb-5 hidden">
             <label for="min_support" class="mb-2 block text-sm font-medium text-gray-900">
-              Nilai Support <b class="text-xs text-red-400">
-                *Semakin rendah nilai support akan semakin
-                banyak proses yang
-                mengakibatkan proses apriori menjadi lama
-              </b>
+              Nilai Support
             </label>
-            <input type="number" id="min_support" name="min_support" min="1" max="100"
+            <input type="number" id="min_support" name="min_support" min="1" max="100" value="50"
               step="0.01"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
               required />
           </div>
-          <div class="mb-5">
+          <div class="mb-5 hidden">
             <label for="min_confidence" class="mb-2 block text-sm font-medium text-gray-900">
               Nilai Confidence
             </label>
-            <input type="number" id="min_confidence" name="min_confidence" min="1" max="100"
+            <input type="number" id="min_confidence" name="min_confidence" min="1" max="100" value="30"
               step="0.01"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
               required />
+          </div>
+          <div class="my-5 flex gap-5 items-end" id="barang-container[0]">
+            <div class="flex-1">
+              <label for="bulan" class="mb-2 block text-sm font-medium text-gray-900">
+                Bulan
+              </label>
+              <select id="bulan" name="bulan"
+                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
+                required>
+                <option value="" disabled selected>Pilih Bulan</option>
+                @foreach ($semuaBulan as $key => $bulan)
+                  <option value="{{ $key }}" @if ($key == 5) selected @endif>
+                    {{ $bulan }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            <div class="flex-1">
+              <label for="tahun" class="mb-2 block text-sm font-medium text-gray-900">
+                Tahun
+              </label>
+              <select id="tahun" name="tahun"
+                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
+                required>
+                <option value="" disabled selected>Pilih Tahun</option>
+                @foreach ($semuaTahun as $tahun)
+                  <option value="{{ $tahun->tahun }}">
+                    {{ $tahun->tahun }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
           </div>
           <div class="flex">
             <button type="submit" id="submit-button"
