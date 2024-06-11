@@ -43,7 +43,7 @@
                     {{ $supp->totalTransaksi($supp->barang_id) }}
                   </td>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    ({{ $supp->totalTransaksi($supp->barang_id) }} / {{ $totalBarang }})
+                    ({{ $supp->totalTransaksi($supp->barang_id) }} / {{ $totalHari }})
                     * 100
                   </td>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
@@ -72,7 +72,7 @@
                     {{ $loop->iteration }}
                   </th>
                   <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    {{ $minSupp->dataBarang($supp->barang_id)->nama }}
+                    {{ $minSupp->dataBarang($minSupp->barang_id)->nama }}
                   </th>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
                     {{ $minSupp->support }}
@@ -111,7 +111,7 @@
                     {{ $itemSet->jumlah_transaksi }}
                   </td>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    ({{ $itemSet->jumlah_transaksi }} / {{ $totalBarang }})
+                    ({{ $itemSet->jumlah_transaksi }} / {{ $totalHari }})
                     * 100
                   </td>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
@@ -137,7 +137,7 @@
               </tr>
             </thead>
             <tbody>
-              @foreach ($dataKombinasiItemSet as $itemSet)
+              @foreach ($dataMinConfidence as $itemSet)
                 <tr class="border-b bg-white hover:bg-gray-50">
                   <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
                     {{ $loop->iteration }}
@@ -152,7 +152,7 @@
                     {{ $itemSet->jumlah_transaksi }}
                   </td>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    ({{ $itemSet->jumlah_transaksi }} / {{ $totalBarang }})
+                    ({{ $itemSet->jumlah_transaksi }} / {{ $totalHari }})
                     * 100
                   </td>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
@@ -184,7 +184,7 @@
                     pelanggan juga akan membeli {{ $item->dataBarang($item->barang_id_b)->nama }}
                   </td>
                   <td scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    {{ $item->support }} %
+                    {{ $item->confidence }} %
                   </td>
                 </tr>
               @endforeach

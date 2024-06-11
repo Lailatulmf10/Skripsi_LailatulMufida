@@ -12,8 +12,6 @@ class Penjualan extends Model
   protected $table = 'penjualan';
   protected $guarded = [
     'id',
-    'created_at',
-    'updated_at',
   ];
 
   public function dataBarang($kdBarang)

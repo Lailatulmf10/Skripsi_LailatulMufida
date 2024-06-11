@@ -28,6 +28,9 @@ class Support extends Model
 
   public function totalTransaksi($barang_id)
   {
-    return Penjualan::where('barang_id', $barang_id)->count();
+    return Penjualan::where('no_faktur', 'NF'.substr($this->kode_pengujian, 2, 6))
+      ->where('barang_id', $barang_id)
+      ->get()
+      ->count();
   }
 }

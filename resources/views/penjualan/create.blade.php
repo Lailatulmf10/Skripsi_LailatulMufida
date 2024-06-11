@@ -26,14 +26,6 @@
         </div>
         <form method="POST" action="{{ route('penjualan.store') }}" class="mx-auto p-4 sm:px-6">
           @csrf
-          <div class="mb-5">
-            <label for="no_faktur" class="mb-2 block text-sm font-medium text-gray-900">
-              No Faktur
-            </label>
-            <input type="text" readonly id="no_faktur" name="no_faktur"
-              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
-              value="{{ $noFaktur }}" required />
-          </div>
           <div class="my-5 flex gap-5 items-end" id="barang-container[0]">
             <div class="flex-1">
               <label for="bulan" class="mb-2 block text-sm font-medium text-gray-900">

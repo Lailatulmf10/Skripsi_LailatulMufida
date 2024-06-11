@@ -40,7 +40,7 @@
                     {{ $loop->iteration }}
                   </th>
                   <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    {{ substr($pengujian->kode_pengujian, 0, 5) }}
+                    {{ $pengujian->kode_pengujian }}
                   </th>
                   <td class="whitespace-nowrap px-6 py-4">
                     {{ $pengujian->nama_penguji }}

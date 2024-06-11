@@ -17,6 +17,7 @@ return new class extends Migration
       $table->id();
       $table->char('kode_pengujian', 127);
       $table->foreignId('barang_id')->constrained('barang');
+      $table->integer('jumlah_transaksi');
       $table->float('support');
       $table->timestamps();
     });

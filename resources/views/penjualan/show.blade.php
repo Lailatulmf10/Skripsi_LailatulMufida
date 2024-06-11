@@ -30,6 +30,7 @@
               <tr>
                 <th scope="col" class="px-6 py-3">No</th>
                 <th scope="col" class="px-6 py-3">Nama Produk</th>
+                <th scope="col" class="px-6 py-3">Hari Ke</th>
                 <th scope="col" class="px-6 py-3">Qty</th>
               </tr>
             </thead>
@@ -40,7 +41,10 @@
                     {{ $loop->iteration }}
                   </th>
                   <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    {{ $data->dataBarang($data->id)->nama }}
+                    {{ $data->dataBarang($data->barang_id)->nama ?? '' }}
+                  </th>
+                  <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                    {{ $data->hari_ke }}
                   </th>
                   <td class="max-w-lg px-6 py-4">
                     <span class="line-clamp-2">

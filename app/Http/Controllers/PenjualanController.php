@@ -59,8 +59,7 @@ class PenjualanController extends Controller
       ->groupBy('tahun')
       ->get();
 
-    $noFaktur = Str::uuid();
-    return view('penjualan.create', compact('semuaBulan', 'semuaTahun', 'noFaktur'));
+    return view('penjualan.create', compact('semuaBulan', 'semuaTahun'));
   }
 
   /**
@@ -73,10 +72,11 @@ class PenjualanController extends Controller
   {
     try {
       $validator = Validator::make($request->all(), [
-        'no_faktur' => 'required',
         'bulan' => 'required',
         'tahun' => 'required',
       ]);
+
+      $noFaktur = 'NF'.$request->tahun.$request->bulan;
 
       if ($validator->fails()) {
         Alert::error('Penjualan gagal ditambahkan', $validator->errors()->first());
@@ -85,10 +85,14 @@ class PenjualanController extends Controller
       $barang = Barang::where('created_at', 'like', '%' . $request->tahun . '-' . $request->bulan . '%')->get();
 
       foreach ($barang as $item) {
-        Penjualan::create([
-          'no_faktur' => $request->no_faktur,
+        if ($item->jumlah < 50) {
+          continue;
+        }
+        Penjualan::updateOrCreate([
+          'no_faktur' => $noFaktur,
           'barang_id' => $item->id,
-          'qty' => $item->jumlah,
+        ], [
+          'qty' => $item->jumlah_transaksi,
         ]);
       }
       Alert::toast('Penjualan berhasil ditambahkan', 'success');
@@ -109,8 +113,7 @@ class PenjualanController extends Controller
   {
     $penjualan = Penjualan::where('no_faktur', $penjualan)->get();
     $no_faktur = $penjualan->first()->no_faktur;
-    $semuaBarang = Barang::all();
-    return view('penjualan.show', compact('penjualan', 'semuaBarang', 'no_faktur'));
+    return view('penjualan.show', compact('penjualan', 'no_faktur'));
   }
 
   /**
