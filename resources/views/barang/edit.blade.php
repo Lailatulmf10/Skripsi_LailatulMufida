@@ -28,6 +28,15 @@
           @csrf
           @method('PATCH')
           <div class="mb-5">
+            {{-- tanggal input --}}
+            <label for="tanggal" class="mb-2 block text-sm font-medium text-gray-900">
+              Bulan Masuk
+            </label>
+            <input type="month" id="tanggal" name="tanggal"
+              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
+              value="{{ old('tanggal', $barang->tanggal) }}" required />
+          </div>
+          <div class="mb-5">
             <label for="name" class="mb-2 block text-sm font-medium text-gray-900">
               Item
             </label>
@@ -39,7 +48,7 @@
             <label for="jumlah" class="mb-2 block text-sm font-medium text-gray-900">
               Jumlah
             </label>
-            <input type="number" id="jumlah" name="jumlah" min="50"
+            <input type="number" id="jumlah" name="jumlah" min="1"
               class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500"
               value="{{ old('jumlah', $barang->jumlah) }}" required />
           </div>

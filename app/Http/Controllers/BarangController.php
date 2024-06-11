@@ -102,6 +102,7 @@ class BarangController extends Controller
   {
     $barang = Barang::query()->find($barang->id);
     $semuaKategori = Kategori::all();
+    $barang->tanggal = $barang->created_at->format('Y-m');
     return view('barang.edit', compact('barang', 'semuaKategori'));
   }
 
