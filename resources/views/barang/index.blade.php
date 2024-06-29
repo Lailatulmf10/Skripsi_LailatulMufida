@@ -65,9 +65,9 @@
                   <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
                     {{ $barang->jumlah }}
                   </th>
-                  <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                  {{-- <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
                     {{ $barang->jumlah_transaksi }}
-                  </th>
+                  </th> --}}
                   <td class="px-6 py-4">
                     <span class="text-sm font-medium text-gray-900">
                       {{ $barang->created_at->format('F Y') }}

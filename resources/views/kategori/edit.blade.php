@@ -24,8 +24,9 @@
             </p>
           </div>
         </div>
-        <form method="POST" action="{{ route('kategori.update') }}" class="mx-auto p-4 sm:px-6">
+        <form method="POST" action="{{ route('kategori.update', ['kategori'=>$kategori->id]) }}" class="mx-auto p-4 sm:px-6">
           @csrf
+          @method('PUT')
           <div class="mb-5">
             <label for="name" class="mb-2 block text-sm font-medium text-gray-900">
               Nama Kategori

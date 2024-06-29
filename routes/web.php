@@ -38,7 +38,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/kategori/create', [KategoriController::class, 'create'])->name('kategori.create');
   Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
   Route::get('/kategori/{kategori}/edit', [KategoriController::class, 'edit'])->name('kategori.edit');
-  Route::patch('/kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
+  Route::put('/kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
   Route::delete('/kategori/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
   Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
