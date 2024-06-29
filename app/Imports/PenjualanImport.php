@@ -43,7 +43,7 @@ class PenjualanImport implements ToCollection
         foreach ($data as $key => $barangId) {
           if ($columns[$key] > 0) {
             Penjualan::updateOrCreate([
-              'no_faktur' => 'NF'.$date->year.$date->month,
+              'no_faktur' => 'NF'.$date->year.sprintf("%02d", $date->month),
               'barang_id' => $barangId,
               'qty' => $columns[$key],
               'created_at' => $date,
