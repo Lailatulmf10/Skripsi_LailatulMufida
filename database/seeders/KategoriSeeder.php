@@ -16,20 +16,6 @@ class KategoriSeeder extends Seeder
   public function run()
   {
     $kategori = [
-      "Laptop",
-      "CPU",
-      "Monitor Komputer",
-      "NoteBook",
-      "DDR",
-      "Proyektor",
-      "Adaptor",
-      "PC",
-      "Baterai",
-      "Case",
-      "Processor",
-      "HandPhone",
-      'Printer',
-
 
     ];
 
