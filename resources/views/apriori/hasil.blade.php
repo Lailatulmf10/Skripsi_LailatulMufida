@@ -122,7 +122,7 @@
             </tbody>
           </table>
           <nav class="p-4 border-t" aria-label="Table navigation">
-            <p class="font-semibold">Kombinasi yang memenuhi minimum confidence >
+            <p class="font-semibold">Kombinasi yang memenuhi minimum Support 2 >
               {{ $dataPengujian->min_confidence }}%</p>
           </nav>
           <table class="w-full text-left text-sm text-gray-500 rtl:text-right">
