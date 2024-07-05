@@ -39,3 +39,4 @@ That's it! You should now be able to run the Laravel project successfully.
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
